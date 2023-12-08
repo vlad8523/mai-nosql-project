@@ -6,4 +6,4 @@ class Client(BaseModel):
     name: str
 
 class UpdateClientModel(BaseModel):
-  name: str
+    name: str

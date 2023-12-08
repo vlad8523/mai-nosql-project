@@ -1,0 +1,12 @@
+services:
+  api:
+    build: app/
+    ports:
+      - 8000:8000
+    environment:
+      - MONGO_URI=mongodb://mongo_db:27017
+
+  mongo_db:
+    image: mongo
+    volumes:
+      - ./data:/data/db

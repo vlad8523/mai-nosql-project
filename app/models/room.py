@@ -8,6 +8,6 @@ class Room(BaseModel):
     attributes: List[str]
 
 class UpdateRoomModel(BaseModel):
-  address: str
+    address: str
     description: str
     attributes: List[str]
