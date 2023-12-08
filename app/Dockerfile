@@ -8,5 +8,4 @@ RUN pip install --no-cache-dir -r /code/requirements.txt
 
 COPY ./ /code/
 
-#ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--env-file", ".env"]
-ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0"]
+ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--env-file", ".env"]

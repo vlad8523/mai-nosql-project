@@ -1,9 +1,11 @@
 from typing import List
 from pydantic import BaseModel
 
+
 class Client(BaseModel):
-    id: int
+    id: str
     name: str
+
 
 class UpdateClientModel(BaseModel):
     name: str
