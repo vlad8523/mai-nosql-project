@@ -4,3 +4,5 @@ data/
 *.pyc
 
 .idea/
+
+mai-nosql-project/data/Users.xml

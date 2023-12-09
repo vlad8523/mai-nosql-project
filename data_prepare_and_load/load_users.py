@@ -16,22 +16,22 @@ def extract_displayed_names(xml_file_path):
     return displayed_names
 
 # Пример использования
-xml_file_path = './mai-nosql-project/data/Users.xml'
+xml_file_path = "C:/Users/Rabinowitz/Desktop/nosql_db/mai-nosql-project/data/Users.xml"
 displayed_names_list = extract_displayed_names(xml_file_path)
 
 # Выводим список
 print(displayed_names_list)
 
 # URL, на который будет отправлен запрос
-url = 'http://localhost:8000/api/clients'
+url = "http://localhost:8000/api/clients"
 
-# Данные, которые вы хотите отправить (в формате словаря)
+
 for name in displayed_names_list:
-    params = {
+    data = {
         'name': name
     }
 
-    response = requests.post(url, params=params)
+    response = requests.post(url, json=data)
 
     # Печать статус-кода и ответа сервера
     print(f'Status Code: {response.status_code}')
