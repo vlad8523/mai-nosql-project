@@ -1,4 +1,5 @@
 venv/
+loader_venv/
 data/
 
 *.pyc

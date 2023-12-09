@@ -15,6 +15,7 @@ def extract_displayed_names(xml_file_path):
 
     return displayed_names
 
+
 # Пример использования
 xml_file_path = "C:/Users/Rabinowitz/Desktop/nosql_db/mai-nosql-project/data/Users.xml"
 displayed_names_list = extract_displayed_names(xml_file_path)
