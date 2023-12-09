@@ -10,3 +10,9 @@ services:
       - ./data:/data/db
     ports:
       - "27017:27017"
+
+  elasticsearch_db:
+    image: elasticsearch:8.10.2
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node

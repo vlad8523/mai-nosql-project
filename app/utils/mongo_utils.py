@@ -8,6 +8,7 @@ from bson import ObjectId
 
 from models.client import Client
 from models.room import Room
+from models.booking import Booking
 
 db_client: AsyncIOMotorClient = None
 
@@ -22,6 +23,13 @@ async def get_clients_collection() -> AsyncIOMotorCollection:
 async def get_rooms_collection() -> AsyncIOMotorCollection:
     mongo_db = os.getenv('MONGO_DB')
     mongo_collection = os.getenv('ROOMS_COLLECTION')
+
+    return db_client.get_database(mongo_db).get_collection(mongo_collection)
+
+
+async def get_bookings_collection() -> AsyncIOMotorCollection:
+    mongo_db = os.getenv('MONGO_DB')
+    mongo_collection = os.getenv('BOOKINGS_COLLECTION')
 
     return db_client.get_database(mongo_db).get_collection(mongo_collection)
 
@@ -72,6 +80,14 @@ def map_room(room: Any) -> Room:
                 address=room['address'],
                 description=room['description'],
                 attributes=room['attributes'])
+
+
+def map_booking(booking: Any) -> Booking:
+    return Booking(id=str(booking['_id']),
+                   room_id=booking['room_id'],
+                   client_id=booking['client_id'],
+                   booking_dates=booking['booking_dates'],
+                   booking_status=booking['booking_status'])
 
 
 def get_filter(_id: str) -> dict:
