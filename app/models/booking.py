@@ -7,8 +7,8 @@ from models.client import Client
 
 class Booking(BaseModel):
     id: str
-    room_id: Room
-    client_id: Client
+    room_id: str
+    client_id: str
     booking_dates: List[str]
     booking_status: str
 
