@@ -7,3 +7,4 @@ data/
 .idea/
 
 mai-nosql-project/data/Users.xml
+loader/data_loader/Rooms.json
