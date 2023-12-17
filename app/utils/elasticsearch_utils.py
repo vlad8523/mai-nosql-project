@@ -25,4 +25,3 @@ async def close_elasticsearch_connect():
     if elasticsearch_client is None:
         return
     await elasticsearch_client.close()
-
