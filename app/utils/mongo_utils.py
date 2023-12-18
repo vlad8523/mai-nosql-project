@@ -88,6 +88,10 @@ def map_booking(booking: Any) -> Booking:
                    client_id=booking['client_id'],
                    booking_dates=booking['booking_dates'],
                    booking_status=booking['booking_status'])
+             #     date= {
+             #         type: Date,
+             #         default: Date.now
+             #     }
 
 
 def get_filter(_id: str) -> dict:
