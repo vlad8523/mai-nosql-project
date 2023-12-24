@@ -16,3 +16,5 @@ services:
     environment:
       - xpack.security.enabled=false
       - discovery.type=single-node
+    ports:
+      - "9200:9200"
