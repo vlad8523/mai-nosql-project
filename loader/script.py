@@ -32,7 +32,7 @@ async def load_data(file_name, index):
     #booking_collection = database["bookings"]
 
     # Считываем инфу из файла
-    with open(f'{file_name}', 'r') as objs_json:
+    with open(f'{file_name}', 'r', encoding="utf-8") as objs_json:
          objs = json.load(objs_json)
          #print(objs[1])
     # Вставлвяем в монгу
@@ -76,4 +76,4 @@ async def load_data(file_name, index):
 
 
 #get_data("loader\data_loader\listings.xlsx")
-asyncio.run(load_data("loader\data_loader\listings.xlsx.json", "rooms"))
+asyncio.run(load_data(r"data_loader\UsersNew.json", "users"))
