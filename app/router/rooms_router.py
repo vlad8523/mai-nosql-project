@@ -6,6 +6,8 @@ from motor.motor_asyncio import AsyncIOMotorCollection
 from starlette.responses import Response
 
 from models.room import Room, UpdateRoomModel
+from repository.repository_rooms import RepositoryRooms
+from repository.search_repository_rooms import SearchRoomRepository
 from utils.mongo_utils import get_rooms_collection, map_room, get_filter
 
 room_router = APIRouter()
@@ -30,15 +32,19 @@ async def update_room(room_id: str, room_model: UpdateRoomModel,
 
 
 @room_router.get("/")
-async def get_all_rooms(db_collection: AsyncIOMotorCollection = Depends(get_rooms_collection)):
-    db_room = []
-    async for Room in db_collection.find():
-        db_room.append(map_room(Room))
-    return db_room
+async def get_all_rooms(repository: RepositoryRooms = Depends(RepositoryRooms.get_instance)):
+    return await repository.get_all()
+
+
+@room_router.get("/filter")
+async def get_by_address(address: str, repository: SearchRoomRepository = Depends(SearchRoomRepository.get_instance)) -> Any:
+    print("get_by_address")
+    return await repository.find_by_address(address)
 
 
 @room_router.get("/{room_id}", response_model=Room)
 async def get_by_id(room_id: str, db_collection: AsyncIOMotorCollection = Depends(get_rooms_collection)) -> Any:
+    print("get_by_id")
     if not ObjectId.is_valid(room_id):
         return Response(status_code=status.HTTP_400_BAD_REQUEST)
     db_room = await db_collection.find_one(get_filter(room_id))

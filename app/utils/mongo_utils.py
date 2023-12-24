@@ -45,20 +45,6 @@ async def connect_and_init_mongo():
         db_client = AsyncIOMotorClient(mongo_uri)
         await db_client.server_info()
         print(f'Connected to mongo with uri {mongo_uri}')
-
-        create_clients_collection_future = db_client.get_database(mongo_db). \
-            create_collection(clients_collection)
-
-        create_bookings_collection_future = db_client.get_database(mongo_db). \
-            create_collection(bookings_collection)
-
-        create_rooms_collection_future = db_client.get_database(mongo_db). \
-            create_collection(rooms_collection)
-
-        if mongo_db not in await db_client.list_database_names():
-            await asyncio.gather(create_clients_collection_future,
-                                 create_bookings_collection_future,
-                                 create_rooms_collection_future)
     except Exception as ex:
         print(f'Cant connect to mongo: {ex}')
 
@@ -86,12 +72,9 @@ def map_booking(booking: Any) -> Booking:
     return Booking(id=str(booking['_id']),
                    room_id=booking['room_id'],
                    client_id=booking['client_id'],
-                   booking_dates=booking['booking_dates'],
+                   booking_start=booking['booking_start'],
+                   booking_end=booking['booking_end'],
                    booking_status=booking['booking_status'])
-             #     date= {
-             #         type: Date,
-             #         default: Date.now
-             #     }
 
 
 def get_filter(_id: str) -> dict:

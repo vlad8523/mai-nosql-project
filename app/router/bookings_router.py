@@ -5,7 +5,7 @@ from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorCollection
 from starlette.responses import Response
 
-from models.booking import Booking, UpdateBookingModel, CreateBookingModel
+from models.booking import Booking, UpdateBookingStatus, CreateBookingModel
 from utils.mongo_utils import get_bookings_collection, map_booking, get_filter
 
 booking_router = APIRouter()
@@ -19,7 +19,7 @@ async def add_booking(booking: CreateBookingModel,
 
 
 @booking_router.put("/{booking_id}", response_model=Booking)
-async def update_booking(booking_id: str, booking_model: UpdateBookingModel,
+async def update_booking(booking_id: str, booking_model: UpdateBookingStatus,
                          db_collection: AsyncIOMotorCollection = Depends(get_bookings_collection)) -> Any:
     if not ObjectId.is_valid(booking_id):
         return Response(status_code=status.HTTP_400_BAD_REQUEST)

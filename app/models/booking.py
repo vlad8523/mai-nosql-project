@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict
 from pydantic import BaseModel
 
 from models.room import Room
@@ -9,18 +9,16 @@ class Booking(BaseModel):
     id: str
     room_id: str
     client_id: str
-    booking_dates: List[str]
+    booking_dates: Dict[str, int]
     booking_status: str
 
 
 class CreateBookingModel(BaseModel):
     room_id: str
     client_id: str
-    booking_dates: List[str]
+    booking_dates: Dict[str, int]
     booking_status: str
 
 
-class UpdateBookingModel(BaseModel):
-    client_id: str
-    booking_dates: List[str]
+class UpdateBookingStatus(BaseModel):
     booking_status: str

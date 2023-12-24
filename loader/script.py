@@ -76,4 +76,4 @@ async def load_data(file_name, index):
 
 
 #get_data("loader\data_loader\listings.xlsx")
-asyncio.run(load_data(r"data_loader\UsersNew.json", "users"))
+asyncio.run(load_data(r"data_loader\bookings.json", "bookings"))

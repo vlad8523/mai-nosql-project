@@ -16,11 +16,17 @@ booking_collection = database["bookings"]
 clients = list(clients_collection.find())
 rooms = list(rooms_collection.find())
 
+for client in clients:
+    client["_id"] = str(client["_id"])
+
+for room in rooms:
+    room["_id"] = str(room["_id"])
+
 array = []
 current_datetime = datetime.today() - timedelta(days=random.randint(1, 10))
 next_day = current_datetime + timedelta(days=random.randint(1, 10))
 # Генерация записей в таблице booking
-for i in range(10):  # Например, создадим 10 записей
+for i in range(10000):  # Например, создадим 10 записей
     client_id = choice(clients)["_id"]
     room_id = choice(rooms)["_id"]
     #booking_dates = [
@@ -35,13 +41,15 @@ for i in range(10):  # Например, создадим 10 записей
     array.append({
         "client_id": client_id,
         "room_id": room_id,
-        "booking_start": booking_start,
-        "booking_end": booking_end,
+        "booking_dates": {
+            "gte": booking_start,
+            "lt": booking_end
+        },
         "booking_status": booking_status
     })
 #booking_collection.insert_many(array)
-with open("bookings.json", "w") as file:
-    file.write(str(array))
-    #json.dump(array, file)
+with open(r"data_loader/bookings.json", "w") as file:
+    # file.write(str(array))
+    json.dump(array, file)
 
 print("Записи успешно добавлены в таблицу booking.")
