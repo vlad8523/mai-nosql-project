@@ -8,6 +8,8 @@ from starlette.responses import Response
 from models.booking import Booking, UpdateBookingStatus, CreateBookingModel
 from utils.mongo_utils import get_bookings_collection, map_booking, get_filter
 
+from cache.memcached_utils import get_memcached_client
+from pymemcache import HashClient
 booking_router = APIRouter()
 
 
@@ -38,12 +40,24 @@ async def get_all_bookings(db_collection: AsyncIOMotorCollection = Depends(get_b
 
 
 @booking_router.get("/{booking_id}", response_model=Booking)
-async def get_by_id(booking_id: str, db_collection: AsyncIOMotorCollection = Depends(get_bookings_collection)) -> Any:
+async def get_by_id(booking_id: str, 
+                    db_collection: AsyncIOMotorCollection = Depends(get_bookings_collection),
+                    memcached_client: HashClient = Depends(get_memcached_client)) -> Any:
     if not ObjectId.is_valid(booking_id):
         return Response(status_code=status.HTTP_400_BAD_REQUEST)
+    
+    db_booking = memcached_client.get(booking_id)
+
+    if db_booking is not None:
+        return db_booking
+
     db_booking = await db_collection.find_one(get_filter(booking_id))
+    
     if db_booking is None:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
+    
+    memcached_client.add(booking_id, db_booking)
+
     return map_booking(db_booking)
 
 
