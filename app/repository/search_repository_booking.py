@@ -64,7 +64,7 @@ class SearchBookingRepository:
 
         query = {
             "range": {
-                "booking_date": booking_date
+                "booking_dates": booking_date
             }
         }
 
@@ -74,6 +74,9 @@ class SearchBookingRepository:
         print(responses)
         if 'hits' not in responses.body:
             return []
+
+        ids = [booking['_id'] for booking in responses.body['hits']['hits']]
+        return ids
 
     @staticmethod
     def get_instance(elasticsearch_client: AsyncElasticsearch = Depends(get_elasticsearch_client)):

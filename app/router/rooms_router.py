@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 from fastapi import APIRouter, Depends, status
 from bson import ObjectId
@@ -7,6 +7,7 @@ from starlette.responses import Response
 
 from models.room import Room, UpdateRoomModel
 from repository.repository_rooms import RepositoryRooms
+from repository.search_repository_booking import SearchBookingRepository
 from repository.search_repository_rooms import SearchRoomRepository
 from utils.mongo_utils import get_rooms_collection, map_room, get_filter
 from typing import List
@@ -36,10 +37,15 @@ async def update_room(room_id: str, room_model: UpdateRoomModel,
 async def get_all_rooms(repository: RepositoryRooms = Depends(RepositoryRooms.get_instance)):
     return await repository.get_all()
 
+@room_router.post("/free_rooms")
+async def get_free_rooms(booking_dates: Dict[str, int],
+                         repository: RepositoryRooms = Depends(RepositoryRooms.get_instance),
+                         search_booking_repository: SearchBookingRepository = Depends(SearchBookingRepository.get_instance)):
+    return await repository.get_free_rooms(booking_dates, search_repository=search_booking_repository)
 
 @room_router.get("/filter")
 async def get_by_address(address: str,
-                         repository: SearchRoomRepository = Depends(SearchRoomRepository.get_instance)) -> Any:
+                         repository: SearchRoomRepository = Depends(SearchRoomRepository.get_instance),) -> Any:
     return await repository.find_by_address(address)
 
 
@@ -54,12 +60,6 @@ async def get_by_id(room_id: str, db_collection: AsyncIOMotorCollection = Depend
     return map_room(db_room)
 
 
-@room_router.post("/attributes")
-async def get_by_attributes(attributes: List[str],
-                            repository: SearchRoomRepository = Depends(SearchRoomRepository.get_instance)):
-    return await repository.find_by_attributes(attributes)
-
-
 @room_router.delete("/{room_id}")
 async def remove_room(room_id: str,
                       db_collection: AsyncIOMotorCollection = Depends(get_rooms_collection)) -> Response:
@@ -69,3 +69,9 @@ async def remove_room(room_id: str,
     if db_room is None:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     return Response()
+
+
+@room_router.post("/attributes")
+async def get_by_attributes(attributes: List[str],
+                            repository: SearchRoomRepository = Depends(SearchRoomRepository.get_instance)):
+    return await repository.find_by_attributes(attributes)

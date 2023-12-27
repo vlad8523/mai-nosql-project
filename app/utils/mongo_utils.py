@@ -1,4 +1,5 @@
 import asyncio
+import json
 import os
 
 from typing import Any
@@ -65,7 +66,7 @@ def map_room(room: Any) -> Room:
     return Room(id=str(room['_id']),
                 address=room['address'],
                 description=room['description'],
-                attributes=room['attributes'])
+                attributes=json.loads(room['attributes']))
 
 
 def map_booking(booking: Any) -> Booking:
