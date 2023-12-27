@@ -29,13 +29,9 @@ next_day = current_datetime + timedelta(days=random.randint(1, 10))
 for i in range(10000):  # Например, создадим 10 записей
     client_id = choice(clients)["_id"]
     room_id = choice(rooms)["_id"]
-    #booking_dates = [
-    #    (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),  # Дата начала брони (на завтра)
-    #    (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")   # Дата окончания брони (послезавтра)
-    #]
     booking_start = int(time.mktime(current_datetime.timetuple()))
     booking_end = int(time.mktime(next_day.timetuple()))
-    booking_status = choice(["booked", "paid", "free"])
+    booking_status = choice(["paid"])
 
     # Вставка записи в таблицу booking
     array.append({

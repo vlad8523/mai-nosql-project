@@ -8,7 +8,7 @@ from bson import ObjectId
 
 from models.client import Client
 from models.room import Room
-from models.booking import Booking
+from models.booking import Booking, UpdateBookingModel
 
 db_client: AsyncIOMotorClient = None
 
@@ -72,9 +72,15 @@ def map_booking(booking: Any) -> Booking:
     return Booking(id=str(booking['_id']),
                    room_id=booking['room_id'],
                    client_id=booking['client_id'],
-                   booking_start=booking['booking_start'],
-                   booking_end=booking['booking_end'],
+                   booking_dates=booking['booking_dates'],
                    booking_status=booking['booking_status'])
+
+
+def map_booking_without_id(booking: Any) -> UpdateBookingModel:
+    return UpdateBookingModel(room_id=booking['room_id'],
+                              client_id=booking['client_id'],
+                              booking_dates=booking['booking_dates'],
+                              booking_status=booking['booking_status'])
 
 
 def get_filter(_id: str) -> dict:

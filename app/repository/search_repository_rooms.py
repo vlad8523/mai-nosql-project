@@ -7,6 +7,7 @@ from fastapi import Depends
 from models.room import UpdateRoomModel, Room
 from utils.elasticsearch_utils import get_elasticsearch_client
 
+from typing import List
 
 class SearchRoomRepository:
     _elasticsearch_client: AsyncElasticsearch
@@ -19,7 +20,7 @@ class SearchRoomRepository:
     async def create(self, room_id: str, room: UpdateRoomModel):
         await self._elasticsearch_client.create(index=self._elasticsearch_index, id=room_id, document=dict(room))
 
-    async def create(self, room_id: str, room: UpdateRoomModel):
+    async def update(self, room_id: str, room: UpdateRoomModel):
         await self._elasticsearch_client.update(index=self._elasticsearch_index, id=room_id, doc=dict(room))
 
     async def delete(self, room_id: str):
@@ -49,6 +50,32 @@ class SearchRoomRepository:
                                            address=room['_source']['address'],
                                            description=room['_source']['description'],
                                            attributes=json.loads(room['_source']['attributes'])), result))
+        return rooms
+
+    async def find_by_attributes(self, attributes: List[str]):
+        index_exist = await self._elasticsearch_client.indices.exists(index=self._elasticsearch_index)
+
+        if not index_exist:
+            return []
+
+        query = {
+            "match": {
+                "attributes": {
+                    "query": str(attributes)
+                }
+            }
+        }
+
+        responses = await self._elasticsearch_client.search(index=self._elasticsearch_index,
+                                                            query=query)
+        if 'hits' not in responses.body:
+            return []
+        result = responses.body['hits']['hits']
+        rooms = list(map(lambda room: Room(id=room['_id'],
+                                           address=room['_source']['address'],
+                                           description=room['_source']['description'],
+                                           attributes=json.loads(room['_source']['attributes'])), result))
+
         return rooms
 
     @staticmethod

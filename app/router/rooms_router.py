@@ -9,6 +9,7 @@ from models.room import Room, UpdateRoomModel
 from repository.repository_rooms import RepositoryRooms
 from repository.search_repository_rooms import SearchRoomRepository
 from utils.mongo_utils import get_rooms_collection, map_room, get_filter
+from typing import List
 
 room_router = APIRouter()
 
@@ -37,8 +38,8 @@ async def get_all_rooms(repository: RepositoryRooms = Depends(RepositoryRooms.ge
 
 
 @room_router.get("/filter")
-async def get_by_address(address: str, repository: SearchRoomRepository = Depends(SearchRoomRepository.get_instance)) -> Any:
-    print("get_by_address")
+async def get_by_address(address: str,
+                         repository: SearchRoomRepository = Depends(SearchRoomRepository.get_instance)) -> Any:
     return await repository.find_by_address(address)
 
 
@@ -51,6 +52,12 @@ async def get_by_id(room_id: str, db_collection: AsyncIOMotorCollection = Depend
     if db_room is None:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     return map_room(db_room)
+
+
+@room_router.post("/attributes")
+async def get_by_attributes(attributes: List[str],
+                            repository: SearchRoomRepository = Depends(SearchRoomRepository.get_instance)):
+    return await repository.find_by_attributes(attributes)
 
 
 @room_router.delete("/{room_id}")

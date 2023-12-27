@@ -4,6 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorCollection
 from utils.mongo_utils import get_rooms_collection, get_filter, map_room
 from models.room import Room, UpdateRoomModel
 
+
 class RepositoryRooms:
     _db_collection: AsyncIOMotorCollection
 
