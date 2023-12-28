@@ -26,7 +26,10 @@ class RepositoryRooms:
     async def get_by_id(self, room_id: str) -> Room | None:
         print(f'Get room {room_id} from mongo')
         db_room = await self._db_collection.find_one(get_filter(room_id))
-        return map_room(db_room)
+        if db_room:
+            return map_room(db_room)
+        else:
+            return None
 
     async def get_free_rooms(self,
                              booking_dates: Dict[str, int],

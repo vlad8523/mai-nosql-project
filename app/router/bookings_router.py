@@ -7,8 +7,10 @@ from starlette.responses import Response
 
 from models.booking import Booking, UpdateBookingModel
 from repository.repository_booking import RepositoryBooking
+from repository.repository_rooms import RepositoryRooms
 from repository.search_repository_booking import SearchBookingRepository
-from utils.mongo_utils import get_bookings_collection, map_booking, get_filter, map_booking_without_id
+from utils.mongo_utils import get_bookings_collection, map_booking, get_filter, map_booking_without_id, \
+    get_clients_collection
 
 from cache.memcached_utils import get_memcached_client
 from pymemcache import HashClient
@@ -18,13 +20,33 @@ booking_router = APIRouter()
 
 @booking_router.post("/")
 async def add_booking(booking_model: UpdateBookingModel,
-                      repository: RepositoryBooking = Depends(RepositoryBooking.get_instance),
-                      memcached_client: HashClient = Depends(get_memcached_client)) -> str:
-    print(dict(booking_model))
-    booking_id = await repository.create_booking(booking_model)
-    memcached_client.add(booking_id, booking_model)
+                      repository_booking: RepositoryBooking = Depends(RepositoryBooking.get_instance),
+                      db_clients: AsyncIOMotorCollection = Depends(get_clients_collection),
+                      repository_rooms: RepositoryRooms = Depends(RepositoryRooms.get_instance),
+                      memcached_client: HashClient = Depends(get_memcached_client),
+                      search_repository: SearchBookingRepository = Depends(SearchBookingRepository.get_instance)) -> str:
 
-    return booking_id
+    db_client = await db_clients.find_one(get_filter(booking_model.client_id))
+
+    if not db_client:
+        return 'Client not found'
+
+    db_room = await repository_rooms.get_by_id(booking_model.room_id)
+
+    if not db_room:
+        return 'Room not found'
+
+    list_occupied_rooms = set(await search_repository.find_by_date(booking_model.booking_dates))
+
+    print(list_occupied_rooms)
+    print(booking_model.room_id)
+
+    if booking_model.room_id not in list_occupied_rooms:
+        booking_id = await repository_booking.create_booking(booking_model)
+        memcached_client.add(booking_id, booking_model, expire=6000)
+        return booking_id
+    else:
+        return 'Room is occupied'
 
 
 @booking_router.post("/update")
@@ -37,12 +59,18 @@ async def update_status(booking_id: str,
         return Response(status_code=status.HTTP_400_BAD_REQUEST)
 
     db_booking = memcached_client.get(booking_id)
+
+    if not db_booking:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+
     db_booking["booking_status"] = 'paid'
 
     await repository.update(booking_id, db_booking)
 
     if db_booking:
         await search_repository.create(booking_id, db_booking)
+
+    memcached_client.delete(booking_id)
 
     return Response(status_code=status.HTTP_200_OK)
 

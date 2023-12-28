@@ -75,7 +75,11 @@ class SearchBookingRepository:
         if 'hits' not in responses.body:
             return []
 
-        ids = [booking['_id'] for booking in responses.body['hits']['hits']]
+        print(*responses.body['hits']['hits'])
+
+        ids = [booking['_source']['room_id'] for booking in responses.body['hits']['hits']]
+
+
         return ids
 
     @staticmethod
